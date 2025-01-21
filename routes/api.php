@@ -3,7 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\APIController;
-use App\Http\Controllers\StudentController; // แก้ไขชื่อ namespace ให้ถูกต้อง
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AuthController;
 
 // Route to get the authenticated user’s data with Sanctum middleware
 Route::get('/user', function (Request $request) {
@@ -26,3 +27,7 @@ Route::controller(APIController::class)->group(function () {
     Route::get('/getpostdatabyid/{id}', [APIController::class, 'GetPostDataById']);
     Route::get('/getusers', [APIController::class, 'getUsers']);
 });
+
+Route::post('/register', [AuthController::class, 'Register']);
+Route::post('/login', [AuthController::class, 'Login']);
+Route::post('/logout', [AuthController::class, 'Logout'])->middleware('auth:sanctum');
