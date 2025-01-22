@@ -37,13 +37,14 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
-    
+
         'api' => [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class, // ใช้สำหรับ Sanctum
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            // Ensure requests to API are properly handled by Sanctum
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            'throttle:api', // Rate limiting for API requests
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
-    ];    
+    ];
 
     /**
      * The application's middleware aliases.

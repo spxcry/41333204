@@ -12,9 +12,9 @@ class AuthController extends Controller
     public function Register(Request $request)
     {
         $fields = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed'
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users|max:255',
+            'password' => 'required|string|confirmed|min:8',
         ]);
 
         $user = User::create([
@@ -23,36 +23,36 @@ class AuthController extends Controller
             'password' => Hash::make($fields['password']),
         ]);
 
-        $token = $user->createToken($fields['name']);
+        $token = $user->createToken('auth_token');
 
-        return [
+        return response()->json([
             'user' => $user,
-            'token' => $token->plainTextToken
-        ];
+            'token' => $token->plainTextToken,
+        ], 201);
     }
 
     // Login
     public function Login(Request $request)
     {
         $fields = $request->validate([
-            'email' => 'required|email|exists:users',
-            'password' => 'required'
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string',
         ]);
 
         $user = User::where('email', $fields['email'])->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
-            return response([
-                'message' => 'The credentials are incorrect.'
+            return response()->json([
+                'message' => 'The provided credentials are incorrect.',
             ], 401);
         }
 
-        $token = $user->createToken($user->name);
+        $token = $user->createToken('auth_token');
 
-        return [
+        return response()->json([
             'user' => $user,
-            'token' => $token->plainTextToken
-        ];
+            'token' => $token->plainTextToken,
+        ], 200);
     }
 
     // Logout
@@ -60,8 +60,8 @@ class AuthController extends Controller
     {
         $request->user()->tokens()->delete();
 
-        return [
-            'message' => 'You are logged out.'
-        ];
+        return response()->json([
+            'message' => 'You have successfully logged out.',
+        ], 200);
     }
 }
